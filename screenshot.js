@@ -16,9 +16,6 @@ exports.screenshot = async (req, res) => {
     if (!url) {
       return res.send('Please provide URL as GET parameter, for example: <a href="?url=https://example.com">?url=https://example.com</a>');
     }
-
-    const width = req.query.width ? parseInt(req.query.width, 10) : 1280;
-    const height = req.query.height ? parseInt(req.query.height, 10) : 800;
   
     if(!browser) {
         browser = await puppeteer.launch({
@@ -29,11 +26,9 @@ exports.screenshot = async (req, res) => {
         page = await browser.newPage();
     }
 
-    await page.setViewport({width, height});
-    await page.goto(url);
-    const imageBuffer = await page.screenshot();
-  
-    res.set('Content-Type', 'image/png');
-    res.send(imageBuffer);
+     await page.goto(url, {waitUntil: 'domcontentloaded'});
+   const html = await page.content(); // serialized HTML of page DOM.
+  res.set('Content-Type', 'html/text');
+  res.send(html);
   };
   
